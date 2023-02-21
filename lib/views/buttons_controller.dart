@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class Controller extends StatelessWidget {
@@ -5,34 +6,38 @@ class Controller extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final socket = ModalRoute.of(context)!.settings.arguments;
     return Scaffold(
         body: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         IconButton(
-            iconSize: 100,
-            padding: EdgeInsets.all(80),
-            onPressed: () {},
-            icon: Icon(Icons.arrow_upward)),
+            iconSize: 50,
+            padding: const EdgeInsets.all(40),
+            onPressed: () {
+              print(socket);
+              print("up");
+            },
+            icon: const Icon(Icons.arrow_upward)),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
           IconButton(
-              iconSize: 100,
+              iconSize: 50,
               onPressed: () {},
-              padding: EdgeInsets.all(80),
-              icon: Icon(Icons.arrow_back_rounded)),
+              padding: const EdgeInsets.all(40),
+              icon: const Icon(Icons.arrow_back_rounded)),
           IconButton(
-              iconSize: 100,
-              padding: EdgeInsets.all(80),
+              iconSize: 50,
+              padding: const EdgeInsets.all(40),
               onPressed: () {},
-              icon: Icon(Icons.arrow_forward))
+              icon: const Icon(Icons.arrow_forward))
         ]),
         IconButton(
-            padding: EdgeInsets.all(80),
+            padding: EdgeInsets.all(40),
             onPressed: () {},
-            iconSize: 100,
-            icon: Icon(Icons.arrow_downward),
+            iconSize: 50,
+            icon: const Icon(Icons.arrow_downward),
             style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
                 side: BorderSide(color: Colors.black),
               ),
@@ -43,7 +48,7 @@ class Controller extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, '/connection');
               },
-              child: Text(
+              child: const Text(
                 "Desconectar",
                 textScaleFactor: 1.5,
               )),

@@ -1,50 +1,93 @@
-// ignore_for_file: prefer_const_constructors
-
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 
-class Connection extends StatelessWidget {
+class Connection extends StatefulWidget {
   const Connection({super.key});
-  final String _ip = "";
+
+  @override
+  State<Connection> createState() => _ConnectionState();
+}
+
+class _ConnectionState extends State<Connection> {
+  Socket? socket;
+  String? ip;
+  String? message;
+  final keyForm = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30.0),
-          child: TextField(
-            keyboardType: TextInputType.number,
-            obscureText: false,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: "Dirección IP",
+      body: Form(
+        key: keyForm,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Direccion IP:",
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "LLene esta linea";
+                  }
+                },
+                onSaved: (value) {
+                  ip = value;
+                },
+              ),
             ),
-          ),
-        ),
-        SizedBox(height: 50),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30.0),
-          child: TextField(
-            keyboardType: TextInputType.number,
-            obscureText: false,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Puerto"),
-          ),
-        ),
-        SizedBox(height: 20),
-        SizedBox(
-          height: 50,
-          child: OutlinedButton(
+            ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/controller');
+                _showSecondPage(context);
               },
-              child: Text(
-                "Conectar",
-                textScaleFactor: 1.5,
-              )),
-        )
-      ],
-    ));
+              child: const Text('Conectar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSecondPage(BuildContext context) {
+    if (keyForm.currentState!.validate()) {
+      keyForm.currentState?.save();
+      conectar();
+      print(ip);
+      Navigator.of(context).pushNamed('/controller', arguments: socket);
+    }
+  }
+
+  void conectar() async {
+    try {
+      socket = await Socket.connect('192.168.1.3', 1782);
+      print(
+          'Conectado al servidor ${socket!.remoteAddress}:${socket!.remotePort}');
+      setState(() {
+        message =
+            'Conectado al servidor ${socket!.remoteAddress}:${socket!.remotePort}';
+      });
+      socket!.write('¡Hola, servidor!\n');
+      socket!.listen((data) {
+        final serverMessage = utf8.decode(data);
+        print('Mensaje recibido del servidor: $serverMessage');
+        setState(() {
+          message = serverMessage;
+        });
+      }, onDone: () {
+        print('Desconectado del servidor');
+        setState(() {
+          message = 'Desconectado del servidor';
+        });
+      });
+    } catch (e) {
+      print(e);
+      setState(() {
+        message = 'Error al conectar al servidor';
+      });
+    }
   }
 }
