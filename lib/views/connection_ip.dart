@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:core';
 import 'package:flutter/material.dart';
+import 'buttons_controller.dart';
 
 class Connection extends StatefulWidget {
   const Connection({super.key});
@@ -10,9 +12,9 @@ class Connection extends StatefulWidget {
 }
 
 class _ConnectionState extends State<Connection> {
-  Socket? socket;
-  String? ip;
-  String? message;
+  late Socket socket;
+  late String ip;
+  late String message = "";
   final keyForm = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -31,12 +33,20 @@ class _ConnectionState extends State<Connection> {
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value!.isEmpty) {
+                  // ignore: unnecessary_new
+                  RegExp exp = new RegExp(
+                      r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+                  ip = value!;
+                  bool isValid = exp.hasMatch(ip);
+                  if (ip.isEmpty) {
                     return "LLene esta linea";
+                  } else if (!isValid) {
+                    return "Ej: IP: 192.168.1.1";
                   }
+                  return null;
                 },
                 onSaved: (value) {
-                  ip = value;
+                  ip = value!;
                 },
               ),
             ),
@@ -45,6 +55,9 @@ class _ConnectionState extends State<Connection> {
                 _showSecondPage(context);
               },
               child: const Text('Conectar'),
+            ),
+            Text(
+              message,
             ),
           ],
         ),
@@ -55,23 +68,24 @@ class _ConnectionState extends State<Connection> {
   void _showSecondPage(BuildContext context) {
     if (keyForm.currentState!.validate()) {
       keyForm.currentState?.save();
-      conectar();
-      print(ip);
-      Navigator.of(context).pushNamed('/controller', arguments: socket);
+      conectar(context);
+      setState(() {
+        message = "Servidor Apagado o Ip Incorrecta";
+      });
     }
   }
 
-  void conectar() async {
+  void conectar(BuildContext context) async {
     try {
-      socket = await Socket.connect('192.168.1.3', 1782);
+      socket = await Socket.connect(ip, 1782);
       print(
-          'Conectado al servidor ${socket!.remoteAddress}:${socket!.remotePort}');
+          'Conectado al servidor ${socket.remoteAddress}:${socket.remotePort}');
       setState(() {
         message =
-            'Conectado al servidor ${socket!.remoteAddress}:${socket!.remotePort}';
+            'Conectado al servidor ${socket.remoteAddress}:${socket.remotePort}';
       });
-      socket!.write('¡Hola, servidor!\n');
-      socket!.listen((data) {
+      socket.write('Hola servidor');
+      socket.listen((data) {
         final serverMessage = utf8.decode(data);
         print('Mensaje recibido del servidor: $serverMessage');
         setState(() {
@@ -83,8 +97,11 @@ class _ConnectionState extends State<Connection> {
           message = 'Desconectado del servidor';
         });
       });
+      final route = MaterialPageRoute(builder: (BuildContext context) {
+        return Controller(servidor: socket);
+      });
+      Navigator.of(context).push(route);
     } catch (e) {
-      print(e);
       setState(() {
         message = 'Error al conectar al servidor';
       });

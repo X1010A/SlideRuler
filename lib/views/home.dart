@@ -1,7 +1,4 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
-import 'package:slide_ruler/views/buttons_controller.dart';
 import 'package:slide_ruler/views/connection_ip.dart';
 
 class Home extends StatelessWidget {
@@ -10,13 +7,14 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/connection',
+      initialRoute: '/',
       routes: {
-        '/connection': (context) => Connection(),
-        '/controller': (context) => Controller()
+        '/': (BuildContext context) => const Connection(),
+        /* '/controller': (BuildContext context) => const Controller(
+              servidor: null,
+            ), */
       },
       debugShowCheckedModeBanner: false,
-      home: Connection(),
     );
   }
 }

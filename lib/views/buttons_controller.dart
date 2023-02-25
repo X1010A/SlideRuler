@@ -2,11 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class Controller extends StatelessWidget {
-  const Controller({super.key});
+  const Controller({super.key, required this.servidor});
 
+  final Socket servidor;
   @override
   Widget build(BuildContext context) {
-    final socket = ModalRoute.of(context)!.settings.arguments;
     return Scaffold(
         body: Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -15,25 +15,30 @@ class Controller extends StatelessWidget {
             iconSize: 50,
             padding: const EdgeInsets.all(40),
             onPressed: () {
-              print(socket);
-              print("up");
+              servidor.write('up');
             },
             icon: const Icon(Icons.arrow_upward)),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
           IconButton(
               iconSize: 50,
-              onPressed: () {},
+              onPressed: () {
+                servidor.write('left');
+              },
               padding: const EdgeInsets.all(40),
               icon: const Icon(Icons.arrow_back_rounded)),
           IconButton(
               iconSize: 50,
               padding: const EdgeInsets.all(40),
-              onPressed: () {},
+              onPressed: () {
+                servidor.write('rigth');
+              },
               icon: const Icon(Icons.arrow_forward))
         ]),
         IconButton(
-            padding: EdgeInsets.all(40),
-            onPressed: () {},
+            padding: const EdgeInsets.all(40),
+            onPressed: () {
+              servidor.write('down');
+            },
             iconSize: 50,
             icon: const Icon(Icons.arrow_downward),
             style: ElevatedButton.styleFrom(
@@ -46,7 +51,8 @@ class Controller extends StatelessWidget {
           height: 50,
           child: OutlinedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/connection');
+                servidor.close();
+                Navigator.pushNamed(context, '/');
               },
               child: const Text(
                 "Desconectar",
