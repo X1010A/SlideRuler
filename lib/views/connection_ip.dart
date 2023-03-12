@@ -41,7 +41,7 @@ class _ConnectionState extends State<Connection> {
                   if (ip.isEmpty) {
                     return "LLene esta linea";
                   } else if (!isValid) {
-                    return "Ej: IP: 192.168.1.1";
+                    return "Ej: IP: 192.168.1.10";
                   }
                   return null;
                 },
@@ -75,7 +75,7 @@ class _ConnectionState extends State<Connection> {
     }
   }
 
-  void conectar(BuildContext context) async {
+  void conectar(BuildContext dialogContext) async {
     try {
       socket = await Socket.connect(ip, 1782);
       print(
@@ -97,10 +97,10 @@ class _ConnectionState extends State<Connection> {
           message = 'Desconectado del servidor';
         });
       });
-      final route = MaterialPageRoute(builder: (BuildContext context) {
+      final route = MaterialPageRoute(builder: (BuildContext dialogContext) {
         return Controller(servidor: socket);
       });
-      Navigator.of(context).push(route);
+      Navigator.of(dialogContext).push(route);
     } catch (e) {
       setState(() {
         message = 'Error al conectar al servidor';

@@ -11,6 +11,7 @@ class Controller extends StatefulWidget {
 }
 
 class _ControllerState extends State<Controller> {
+  bool changeColor = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
